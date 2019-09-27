@@ -1,0 +1,7 @@
+{
+    "name": "kingmaster772/php-database-connector",
+    "description": "A PHP-PDO based database connector to some provider such as mysql, postgre, sqlserver, oracle",
+    "require": {
+        "php": "^7.2"
+    }
+}
