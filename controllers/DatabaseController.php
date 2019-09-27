@@ -2,6 +2,8 @@
 
 namespace controllers;
 
+use PDO;
+
 class DatabaseController {
 
     private $providerName;
@@ -11,9 +13,9 @@ class DatabaseController {
     private $databaseName;
     private $connection = null;
     private $tableRows = null;
-    public $conn, $stmt;
+    public $result, $conn, $stmt;
 
-    public function setConnection($providerName, $serverName, $userName, $password, $databaseName) {
+    public function __construct($providerName, $serverName, $userName, $password, $databaseName) {
         $this->providerName = $providerName;
         $this->serverName = $serverName;
         $this->userName = $userName;
@@ -24,11 +26,11 @@ class DatabaseController {
     //call this method to start connection
     public function connect() {
         try {
-            $connection = new PDO($providerName.":host=".$this->serverName.";dbname=".$this->databaseName."", $this->userName, $this->password);
+            $this->connection = new PDO($this->providerName.":host=".$this->serverName.";dbname=".$this->databaseName."", $this->userName, $this->password);
             // set the PDO error mode to exception
-            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             //echo "Connected successfully";
-            return $connection;
+            return $this->connection;
         } catch(PDOException $e) {
             echo "Connection failed: " . $e->getMessage();
         }
@@ -42,23 +44,31 @@ class DatabaseController {
 
     public function select($query) {
         try {
-            connect();
-            $stmt = $connection->prepare($query);
+            $this->connect();
+            $stmt = $this->connection->prepare($query);
             $stmt->execute();
 
             // set the resulting array to associative
-            $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-            $tableRows = new TableRows(new RecursiveArrayIterator($stmt->fetchAll()));
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            // $tableRows = new TableRows(new RecursiveArrayIterator($result->fetchAll()));
+            // var_dump($stmt->fetchAll());
+            $data = $stmt->fetchAll();
+            // var_dump($object->name);
+            // echo $data[0]["name"];
+            // foreach ($data as $row) {
+            //     echo $row["name"]."<br />\n";
+            // }
+            $this->result = $data;
         } catch(PDOException $e) {
             echo "Error: " . $e->getMessage();
         }
 
-        disconnect();
+        $this->disconnect();
     }
 
     public function insert($query) {
         try {
-            connect();
+            $this->connect();
             // use exec() because no results are returned
             $connection->exec($query);
             echo "New record created successfully";
@@ -66,12 +76,12 @@ class DatabaseController {
             echo $query . "<br>" . $e->getMessage();
         }
 
-        disconnect();
+        $this->disconnect();
     }
 
     public function insertMultiple($multiQuery = array()) {
         try {
-            connect();
+            $this->connect();
             // begin the transaction
             $connection->beginTransaction();
             // our SQL statements
@@ -87,12 +97,12 @@ class DatabaseController {
             echo "Error: " . $e->getMessage();
         }
 
-        disconnect();
+        $this->disconnect();
     }
 
     public function delete($query) {
         try {
-            connect();
+            $this->connect();
             // use exec() because no results are returned
             $connection->exec($query);
             echo "Record deleted successfully";
@@ -100,12 +110,12 @@ class DatabaseController {
             echo $query . "<br>" . $e->getMessage();
         }
 
-        disconnect();
+        $this->disconnect();
     }
 
     public function update($query) {
         try {
-            connect();
+            $this->connect();
             // Prepare statement
             $stmt = $connection->prepare($query);
             // execute the query
@@ -116,11 +126,11 @@ class DatabaseController {
             echo $query . "<br>" . $e->getMessage();
         }
 
-        disconnect();
+        $this->disconnect();
     }
 
-    public function getResult() {
-        return $tableRows;
+    public function getResultArray() {
+        return $this->result;
     }
 
 
