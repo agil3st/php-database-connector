@@ -1,6 +1,18 @@
 {
     "name": "kingmaster772/php-database-connector",
+    "type": "library",
     "description": "A PHP-PDO based database connector to some provider such as mysql, postgre, sqlserver, oracle",
+    "keywords": ["database","connector"],
+    "homepage": "https://github.com/kingmaster772/php-database-connector",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Agil Setiawan",
+            "email": "agil@kingmaster.id",
+            "homepage": "https://kingmaster.id",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^7.2"
     }
